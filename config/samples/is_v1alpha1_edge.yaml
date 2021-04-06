@@ -1,0 +1,7 @@
+apiVersion: is.github.com/v1alpha1
+kind: Edge
+metadata:
+  name: edge-sample
+spec:
+  # Add fields here
+  foo: bar

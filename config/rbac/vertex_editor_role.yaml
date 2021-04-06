@@ -1,0 +1,24 @@
+# permissions for end users to edit vertices.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vertex-editor-role
+rules:
+- apiGroups:
+  - is.github.com
+  resources:
+  - vertices
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - is.github.com
+  resources:
+  - vertices/status
+  verbs:
+  - get

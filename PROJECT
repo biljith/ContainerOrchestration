@@ -1,0 +1,10 @@
+domain: github.com
+repo: dynamic-orchestration
+resources:
+- group: is
+  kind: Vertex
+  version: v1alpha1
+- group: is
+  kind: Edge
+  version: v1alpha1
+version: "2"
