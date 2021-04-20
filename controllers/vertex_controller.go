@@ -18,13 +18,14 @@ package controllers
 
 import (
 	"context"
-
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	isv1alpha1 "dynamic-orchestration/api/v1alpha1"
+	"dynamic-orchestration/pkg/spawn"
 )
 
 // VertexReconciler reconciles a Vertex object
@@ -39,10 +40,28 @@ type VertexReconciler struct {
 
 func (r *VertexReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	_ = r.Log.WithValues("vertex", req.NamespacedName)
+	reqLogger := r.Log.WithValues("vertex", req.NamespacedName)
 
-	// your logic here
+	instance := &isv1alpha1.Vertex{}
+	err := r.Get(context.TODO(), req.NamespacedName, instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// object not found, could have been deleted after
+			// reconcile request, hence don't requeue
+			return ctrl.Result{}, nil
+		}
 
+		// error reading the object, requeue the request
+		return ctrl.Result{}, err
+	}
+	pod := spawn.NewPod(instance)
+	err = r.Create(context.TODO(), pod)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// Successfully created a Pod
+	reqLogger.Info("Pod Created successfully", "name", pod.Name)
 	return ctrl.Result{}, nil
 }
 
